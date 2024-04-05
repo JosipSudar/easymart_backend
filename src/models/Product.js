@@ -1,6 +1,6 @@
-import { Schema, model } from "mongoose";
+const mongoose = require("mongoose");
 
-const productSchema = new Schema({
+const productSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -14,8 +14,9 @@ const productSchema = new Schema({
   category: { type: String, required: true },
   thumbnail: { type: String, required: true },
   images: { type: [String], required: true },
-  quantity: { type: Number, required: true },
+  quantity: { type: Number, required: true, default: 1 },
 });
 
-const Product = model("Product", productSchema);
-export default Product;
+const Product = mongoose.model("Product", productSchema);
+
+module.exports = Product;
