@@ -13,7 +13,32 @@ const createProduct = async (req, res) => {
   }
 };
 
+const getCategory = async (req, res) => {
+  res.send("get category");
+};
+
+const getBrand = async (req, res) => {
+  res.send("get brand");
+};
+
+const getProductByCategory = async (req, res) => {
+  res.send("get product by category");
+};
+
+const getProductByBrand = async (req, res) => {
+  res.send("get product by brand");
+};
+
+const singleProduct = async (req, res) => {
+  res.send("get single product");
+};
+
 module.exports = {
   getAllProducts,
   createProduct,
+  getCategory,
+  getBrand,
+  getProductByCategory,
+  getProductByBrand,
+  singleProduct,
 };
