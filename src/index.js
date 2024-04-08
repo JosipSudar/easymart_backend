@@ -1,14 +1,20 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 const connectDB = require("./db/connect");
 const products = require("./routes/products");
+const errorHanlderMiddleware = require("./middleware/error-handler");
 require("dotenv").config();
 
 app.use(express.json());
 
+app.use(cors());
+
 app.use("/api/products", products);
 
-const port = process.env.port || 5000;
+app.use(errorHanlderMiddleware); // Error handler middleware
+
+const port = process.env.port || 3000;
 
 const start = async () => {
   try {

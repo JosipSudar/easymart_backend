@@ -1,7 +1,12 @@
 const Product = require("../models/product");
 
 const getAllProducts = async (req, res) => {
-  res.send("get all products");
+  try {
+    const products = await Product.find();
+    res.status(200).json({ products, nbHits: products.length });
+  } catch (error) {
+    res.status(500).json({ msg: error });
+  }
 };
 
 const createProduct = async (req, res) => {
@@ -30,7 +35,18 @@ const getProductByBrand = async (req, res) => {
 };
 
 const singleProduct = async (req, res) => {
-  res.send("get single product");
+  try {
+    const { id } = req.params;
+    const product = await Product.findOne({ _id: id });
+    res.status(200).json({ product });
+  } catch (error) {
+    res.status(500).json({ msg: error });
+  }
+};
+
+const updateProducts = async (req, res) => {
+  try {
+  } catch (error) {}
 };
 
 module.exports = {
@@ -41,4 +57,5 @@ module.exports = {
   getProductByCategory,
   getProductByBrand,
   singleProduct,
+  updateProducts,
 };
