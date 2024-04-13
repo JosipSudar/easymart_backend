@@ -13,8 +13,8 @@ const userSchema = new mongoose.Schema({
     enum: ["admin", "user"],
     default: "user",
   },
-  purchases: { type: [String], required: true },
-  timestamps: true,
+  purchases: { type: [String], required: true, default: [] },
+  timecreated: { type: Date, required: true, default: Date.now },
 });
 
 const User = mongoose.model("User", userSchema);
