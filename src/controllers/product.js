@@ -18,25 +18,10 @@ const createProduct = async (req, res) => {
   }
 };
 
-const getCategory = async (req, res) => {
-  res.send("get category");
-};
-
-const getBrand = async (req, res) => {
-  res.send("get brand");
-};
-
-const getProductByCategory = async (req, res) => {
-  res.send("get product by category");
-};
-
-const getProductByBrand = async (req, res) => {
-  res.send("get product by brand");
-};
-
 const singleProduct = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!id) throw new CustomError(400, "Product ID is required");
     const product = await Product.findOne({ _id: id });
     res.status(200).json({ product });
   } catch (error) {
@@ -52,10 +37,6 @@ const updateProducts = async (req, res) => {
 module.exports = {
   getAllProducts,
   createProduct,
-  getCategory,
-  getBrand,
-  getProductByCategory,
-  getProductByBrand,
   singleProduct,
   updateProducts,
 };
