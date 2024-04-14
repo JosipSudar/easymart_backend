@@ -1,4 +1,4 @@
-const User = require("../models/user");
+const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
@@ -6,14 +6,15 @@ const nodemailer = require("nodemailer");
 const sendEmail = async (emailData) => {
   let transporter = nodemailer.createTransport({
     service: "gmail",
+    host: "smtp.gmail.com",
     auth: {
-      user: process.env.ADMIN_EMAIL,
-      pass: process.env.PASSWORD,
+      user: process.env.NODEMAILER_EMAIL,
+      pass: process.env.NODEMAILER_PASSWORD,
     },
   });
 
   let mailOptions = {
-    from: process.env.ADMIN_EMAIL,
+    from: process.env.NODEMAILER_EMAIL,
     to: emailData.to,
     subject: emailData.subject,
     html: emailData.html,
@@ -35,6 +36,8 @@ const sendEmailVerification = async (req, res) => {
       email,
     });
     if (!user) return res.status(404).json({ msg: "User not found" });
+    if (user.verified)
+      return res.status(400).json({ msg: "Email already verified" });
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
@@ -47,8 +50,12 @@ const sendEmailVerification = async (req, res) => {
         <a href=${link}>${link}</a>
       `,
     };
+
     await sendEmail(emailData);
-    res.status(200).json({ msg: "Email verification link sent" });
+    if (res.status(200).json({ msg: "Email verification link sent" })) {
+      user.verified = true;
+      await user.save();
+    }
   } catch (error) {
     res.status(500).json({ msg: error });
   }

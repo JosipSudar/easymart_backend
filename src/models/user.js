@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema({
     street: { type: String, required: false, default: "" },
     city: { type: String, required: false, default: "" },
     zip: { type: String, required: false, default: "" },
+    country: { type: String, required: false, default: "" },
   },
   verified: { type: Boolean, required: true, default: false },
 });

@@ -31,6 +31,8 @@ const singleProduct = async (req, res) => {
 
 const updateProducts = async (req, res) => {
   try {
+    const { id } = req.params;
+    if (!id) throw new CustomError(400, "Product ID is required");
   } catch (error) {}
 };
 
