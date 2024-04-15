@@ -52,10 +52,22 @@ const sendEmailVerification = async (req, res) => {
     };
 
     await sendEmail(emailData);
-    if (res.status(200).json({ msg: "Email verification link sent" })) {
-      user.verified = true;
-      await user.save();
-    }
+    res.status(200).json({ msg: "Email verification link sent" });
+  } catch (error) {
+    res.status(500).json({ msg: error });
+  }
+};
+
+const checkEmailVerification = async (req, res) => {
+  const { token } = req.params;
+  if (!token) return res.status(400).json({ msg: "Invalid token" });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findOne({ _id: decoded.id });
+    if (!user) return res.status(404).json({ msg: "User not found" });
+    user.verified = true;
+    await user.save();
+    res.status(200).json({ msg: "Email verified" });
   } catch (error) {
     res.status(500).json({ msg: error });
   }
@@ -133,4 +145,5 @@ module.exports = {
   getUserById,
   updateUserData,
   sendEmailVerification,
+  checkEmailVerification,
 };

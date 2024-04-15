@@ -18,6 +18,17 @@ const createProduct = async (req, res) => {
   }
 };
 
+const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) throw new CustomError(400, "Product ID is required");
+    await Product.findByIdAndDelete(id);
+    res.status(200).json({ msg: "Product deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ msg: error });
+  }
+};
+
 const singleProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -33,7 +44,14 @@ const updateProducts = async (req, res) => {
   try {
     const { id } = req.params;
     if (!id) throw new CustomError(400, "Product ID is required");
-  } catch (error) {}
+    const product = await Product.findOneAndUpdate({ _id: id }, req.body, {
+      new: true,
+    });
+    await product.save();
+    res.status(200).json({ product });
+  } catch (error) {
+    res.status(500).json({ msg: error });
+  }
 };
 
 module.exports = {
@@ -41,4 +59,5 @@ module.exports = {
   createProduct,
   singleProduct,
   updateProducts,
+  deleteProduct,
 };

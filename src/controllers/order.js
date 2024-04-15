@@ -1,9 +1,14 @@
+const User = require("../models/User");
 const Order = require("../models/order");
 const CustomError = require("../errors/custom-error");
 
 const createOrder = async (req, res) => {
   try {
+    const userID = req.body.user;
+    const user = await User.findOne({ _id: userID });
     const order = await Order.create(req.body);
+    user.purchases.push(order._id);
+    await user.save();
     res.status(201).json({ order });
   } catch (error) {
     console.log(req.body);
