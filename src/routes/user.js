@@ -8,6 +8,7 @@ const {
   updateUserData,
   sendEmailVerification,
   checkEmailVerification,
+  getUsers,
 } = require("../controllers/user");
 
 router.route("/register").post(register);
@@ -16,5 +17,6 @@ router.route("/:id").get(getUserById);
 router.route("/:id").put(updateUserData);
 router.route("/verify").post(sendEmailVerification);
 router.route("/verify/:token").get(checkEmailVerification);
+router.route("/").get(getUsers);
 
 module.exports = router;
