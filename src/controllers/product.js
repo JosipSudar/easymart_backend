@@ -48,7 +48,7 @@ const updateProducts = async (req, res) => {
       new: true,
     });
     await product.save();
-    res.status(200).json({ product });
+    res.status(200).json({ msg: "Product updated successfully" });
   } catch (error) {
     res.status(500).json({ msg: error });
   }
