@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Order = require("../models/order");
 const Product = require("../models/product");
 const CustomError = require("../errors/custom-error");
+const { StatusCodes } = require("http-status-codes");
 
 const createOrder = async (req, res) => {
   try {
@@ -16,30 +17,31 @@ const createOrder = async (req, res) => {
     const order = await Order.create(req.body);
     user.purchases.push(order._id);
     await user.save();
-    res.status(201).json({ msg: "Order created successfully" });
+    res.status(StatusCodes.CREATED).json({ msg: "Order created successfully" });
   } catch (error) {
     console.log(req.body);
-    throw new CustomError(500, error);
+    throw new CustomError(StatusCodes.INTERNAL_SERVER_ERROR, error);
   }
 };
 
 const getOrders = async (req, res) => {
   try {
     const orders = await Order.find();
-    res.status(200).json({ orders });
+    res.status(StatusCodes.OK).json({ orders });
   } catch (error) {
-    throw new CustomError(500, error);
+    throw new CustomError(StatusCodes.INTERNAL_SERVER_ERROR, error);
   }
 };
 
 const getOrderByUser = async (req, res) => {
   try {
     const { id } = req.params;
-    if (!id) throw new CustomError(400, "User ID is required");
+    if (!id)
+      throw new CustomError(StatusCodes.BAD_REQUEST, "User ID is required");
     const orders = await Order.find({ user: id });
-    res.status(200).json({ orders });
+    res.status(StatusCodes.OK).json({ orders });
   } catch (error) {
-    throw new CustomError(500, error);
+    throw new CustomError(StatusCodes.INTERNAL_SERVER_ERROR, error);
   }
 };
 
@@ -48,9 +50,9 @@ const getOrderById = async (req, res) => {
     const { id } = req.params;
     if (!id) throw new CustomError(400, "Order ID is required");
     const order = await Order.findOne({ _id: id });
-    res.status(200).json({ order });
+    res.status(StatusCodes.OK).json({ order });
   } catch (error) {
-    throw new CustomError(500, error);
+    throw new CustomError(StatusCodes.INTERNAL_SERVER_ERROR, error);
   }
 };
 

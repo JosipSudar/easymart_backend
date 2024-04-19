@@ -9,6 +9,7 @@ const newsletter = require("./routes/newsletter");
 const errorHanlderMiddleware = require("./middleware/error-handler");
 const authMiddleware = require("./middleware/auth");
 require("dotenv").config();
+require("http-status-codes");
 
 app.use(express.json());
 

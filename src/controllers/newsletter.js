@@ -1,15 +1,18 @@
+const { StatusCodes } = require("http-status-codes");
 const Newsletter = require("../models/Newsletter");
 
 const subscribeToNewsletter = async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) {
-      return res.status(400).json({ message: "Email is required" });
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "Email is required" });
     }
     const newsletter = await Newsletter.create({ email });
-    res.status(201).json({ newsletter });
+    res.status(StatusCodes.CREATED).json({ newsletter });
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error });
   }
 };
 

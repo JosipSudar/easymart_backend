@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const { StatusCodes } = require("http-status-codes");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
@@ -35,9 +36,12 @@ const sendEmailVerification = async (req, res) => {
     const user = await User.findOne({
       email,
     });
-    if (!user) return res.status(404).json({ msg: "User not found" });
+    if (!user)
+      return res.status(StatusCodes.NOT_FOUND).json({ msg: "User not found" });
     if (user.verified)
-      return res.status(400).json({ msg: "Email already verified" });
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ msg: "Email already verified" });
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
@@ -52,24 +56,26 @@ const sendEmailVerification = async (req, res) => {
     };
 
     await sendEmail(emailData);
-    res.status(200).json({ msg: "Email verification link sent" });
+    res.status(StatusCodes.OK).json({ msg: "Email verification link sent" });
   } catch (error) {
-    res.status(500).json({ msg: error });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: error });
   }
 };
 
 const checkEmailVerification = async (req, res) => {
   const { token } = req.params;
-  if (!token) return res.status(400).json({ msg: "Invalid token" });
+  if (!token)
+    return res.status(StatusCodes.BAD_REQUEST).json({ msg: "Invalid token" });
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findOne({ _id: decoded.id });
-    if (!user) return res.status(404).json({ msg: "User not found" });
+    if (!user)
+      return res.status(StatusCodes.NOT_FOUND).json({ msg: "User not found" });
     user.verified = true;
     await user.save();
-    res.status(200).json({ msg: "Email verified" });
+    res.status(StatusCodes.OK).json({ msg: "Email verified" });
   } catch (error) {
-    res.status(500).json({ msg: error });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: error });
   }
 };
 
@@ -77,7 +83,10 @@ const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
     const user = await User.findOne({ email });
-    if (user) return res.status(400).json({ msg: "User already exists" });
+    if (user)
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ msg: "User already exists" });
     const hashedPassword = await bcrypt.hash(password, 10);
     let role = "user";
     if (email === process.env.ADMIN_EMAIL) role = "admin";
@@ -88,9 +97,9 @@ const register = async (req, res) => {
       role,
     });
     await newUser.save();
-    res.status(201).json({ msg: "User created successfully" });
+    res.status(StatusCodes.CREATED).json({ msg: "User created successfully" });
   } catch (error) {
-    res.status(500).json({ msg: error });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: error });
   }
 };
 
@@ -98,9 +107,15 @@ const login = async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
-    if (!user) return res.status(400).json({ msg: "User does not exist" });
+    if (!user)
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ msg: "User does not exist" });
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json({ msg: "Incorrect password" });
+    if (!match)
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ msg: "Incorrect password" });
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
@@ -111,18 +126,21 @@ const login = async (req, res) => {
       role: user.role,
     });
   } catch (error) {
-    res.status(500).json({ msg: error });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: error });
   }
 };
 
 const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
-    if (!id) return res.status(400).json({ msg: "User ID is required" });
+    if (!id)
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ msg: "User ID is required" });
     const user = await User.findOne({ _id: id });
-    res.status(200).json({ user });
+    res.status(StatusCodes.OK).json({ user });
   } catch (error) {
-    res.status(500).json({ msg: error });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: error });
   }
 };
 
@@ -132,25 +150,27 @@ const updateUserData = async (req, res) => {
     const { userData } = req.body;
     const { userAdress } = userData;
     const user = await User.findOne({ _id: id });
-    if (!user) return res.status(404).json({ msg: "User not found" });
+    if (!user)
+      return res.status(StatusCodes.NOT_FOUND).json({ msg: "User not found" });
 
     user.userAdress = userAdress;
     user.markModified("userAdress"); // Tell Mongoose that userAdress has been updated
     await user.save();
 
-    res.status(200).json({ msg: "User data updated" });
+    res.status(StatusCodes.OK).json({ msg: "User data updated" });
   } catch (error) {
-    res.status(500).json({ msg: error });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: error });
   }
 };
 
 const getUsers = async (req, res) => {
   try {
     const users = await User.find();
-    if (!users) return res.status(404).json({ msg: "No users found" });
-    res.status(200).json({ users });
+    if (!users)
+      return res.status(StatusCodes.NOT_FOUND).json({ msg: "No users found" });
+    res.status(StatusCodes.OK).json({ users });
   } catch (error) {
-    res.status(500).json({ msg: error });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: error });
   }
 };
 
